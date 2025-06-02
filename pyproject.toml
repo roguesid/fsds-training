@@ -1,0 +1,29 @@
+# pyproject.toml
+[project]
+name = "python-project-uv"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+
+requires-python = ">=3.12"
+dependencies = [
+    "numpy==1.26.4",
+    "pandas>=2.2.3",
+]
+
+[project.optional-dependencies]
+formatter = [
+    "black",
+    "isort",
+    "flake8",
+]
+plot = [
+    "matplotlib",
+    "seaborn",
+]
+test = [
+    "pytest",
+]
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"

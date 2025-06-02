@@ -1,0 +1,20 @@
+Metadata-Version: 2.4
+Name: python-project-uv
+Version: 0.1.0
+Summary: Add your description here
+Requires-Python: >=3.12
+Description-Content-Type: text/markdown
+Requires-Dist: numpy==1.26.4
+Requires-Dist: pandas>=2.2.3
+Provides-Extra: formatter
+Requires-Dist: black; extra == "formatter"
+Requires-Dist: isort; extra == "formatter"
+Requires-Dist: flake8; extra == "formatter"
+Provides-Extra: plot
+Requires-Dist: matplotlib; extra == "plot"
+Requires-Dist: seaborn; extra == "plot"
+Provides-Extra: test
+Requires-Dist: pytest; extra == "test"
+
+# fsds-training
+training repo for FSDS learning

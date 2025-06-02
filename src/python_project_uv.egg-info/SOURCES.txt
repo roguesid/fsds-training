@@ -1,0 +1,8 @@
+README.md
+pyproject.toml
+src/nonstandardcode.py
+src/python_project_uv.egg-info/PKG-INFO
+src/python_project_uv.egg-info/SOURCES.txt
+src/python_project_uv.egg-info/dependency_links.txt
+src/python_project_uv.egg-info/requires.txt
+src/python_project_uv.egg-info/top_level.txt
