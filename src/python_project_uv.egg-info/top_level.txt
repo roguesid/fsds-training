@@ -1,1 +1,6 @@
+data_ingestion
+main
 nonstandardcode
+preprocessing
+scoring
+training
