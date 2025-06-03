@@ -21,17 +21,21 @@ jobs:
         run: conda info --envs
 
       - name: Check tool versions
-        run: 
+        run: |
           conda activate fsds-env
           black --version
           isort --version
           flake8 --version
 
       - name: Run isort
-        run: isort . --check --diff
+        run: |
+          conda activate fsds-env
+          isort . --check --diff
 
       - name: Run black
-        run: black . --check --diff
+        run: |
+          conda activate fsds-env
+          black . --check --diff
 
       - name: Run flake8
         run: flake8 .
