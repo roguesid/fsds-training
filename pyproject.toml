@@ -1,14 +1,13 @@
-# pyproject.toml
 [project]
-name = "python-project-uv"
-version = "0.1.0"
+name = "fsds-training"
+version = "0.5.0"
 description = "Add your description here"
 readme = "README.md"
 
 requires-python = ">=3.12"
 dependencies = [
-    "numpy==1.26.4",
-    "pandas>=2.2.3",
+    "numpy",
+    "pandas",
     "scikit-learn>=1.6.1",
     "six>=1.17.0",
 ]
@@ -26,6 +25,11 @@ plot = [
 test = [
     "pytest",
 ]
+
 [build-system]
-requires = ["setuptools"]
+requires = ["setuptools", "wheel"]
 build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["datasets", "fsds_training"]
