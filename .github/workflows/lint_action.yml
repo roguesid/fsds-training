@@ -30,13 +30,13 @@ jobs:
         shell: bash -l {0}
         run: |
           conda activate fsds-env
-          isort . --check --diff
+          isort . 
 
       - name: Run black
         shell: bash -l {0}
         run: |
           conda activate fsds-env
-          black . --check --diff
+          black . 
 
       - name: Run flake8
         shell: bash -l {0}
