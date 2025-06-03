@@ -1,10 +1,13 @@
 import argparse
-import os
-import pandas as pd
-import pickle
 import logging
-from fsds_training import training
-from fsds_training import preprocessing
+import os
+import pickle
+
+import pandas as pd
+
+from fsds_training import preprocessing, training
+
+
 def setup_logging(log_level, log_path=None, no_console_log=False):
     logger = logging.getLogger()
     logger.setLevel(log_level)
@@ -13,7 +16,9 @@ def setup_logging(log_level, log_path=None, no_console_log=False):
         for handler in logger.handlers:
             logger.removeHandler(handler)
 
-    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    formatter = logging.Formatter(
+        "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+    )
 
     if not no_console_log:
         console_handler = logging.StreamHandler()
@@ -28,6 +33,7 @@ def setup_logging(log_level, log_path=None, no_console_log=False):
         logging.info(f"Logging to file: {log_path}")
 
     logging.getLogger(__name__)
+
 
 def main():
     parser = argparse.ArgumentParser(description="Train machine learning models.")
@@ -97,14 +103,18 @@ def main():
         pickle.dump(lin_reg_model, f)
     logger.info(f"Linear Regression model saved to {lin_reg_model_path}")
 
-    logger.info("Training Random Forest model with Grid Search (this may take a while)...")
+    logger.info(
+        "Training Random Forest model with Grid Search (this may take a while)..."
+    )
     rf_grid_search_model = training.grid_search_rf(housing_prepared, housing_labels)
     rf_model_path = os.path.join(output_model_dir, "random_forest_model.pkl")
     with open(rf_model_path, "wb") as f:
         pickle.dump(rf_grid_search_model.best_estimator_, f)
     logger.info(f"Random Forest model saved to {rf_model_path}")
     logger.info(f"Best Random Forest parameters: {rf_grid_search_model.best_params_}")
-    logger.info(f"Best Random Forest RMSE: {(-rf_grid_search_model.best_score_)**0.5:.4f}")
+    logger.info(
+        f"Best Random Forest RMSE: {(-rf_grid_search_model.best_score_)**0.5:.4f}"
+    )
 
     imputer_path = os.path.join(output_model_dir, "imputer.pkl")
     with open(imputer_path, "wb") as f:
@@ -112,6 +122,7 @@ def main():
     logger.info(f"Imputer saved to {imputer_path}")
 
     logger.info("Model training complete.")
+
 
 if __name__ == "__main__":
     main()

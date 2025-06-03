@@ -1,7 +1,7 @@
 from data_ingestion import fetch_housing_data, load_housing_data
-from preprocessing import add_income_cat, stratified_split, add_features
-from training import prepare_data, train_linear_regression, grid_search_rf
+from preprocessing import add_features, add_income_cat, stratified_split
 from scoring import evaluate_model
+from training import grid_search_rf, prepare_data, train_linear_regression
 
 
 def main():

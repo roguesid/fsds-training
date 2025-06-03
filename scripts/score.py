@@ -1,11 +1,12 @@
 import argparse
-import os
-import pandas as pd
-import pickle
 import logging
-from fsds_training import preprocessing
-from fsds_training import training
-from fsds_training import scoring
+import os
+import pickle
+
+import pandas as pd
+
+from fsds_training import preprocessing, scoring, training
+
 
 def setup_logging(log_level, log_path=None, no_console_log=False):
     logger = logging.getLogger()
@@ -15,7 +16,9 @@ def setup_logging(log_level, log_path=None, no_console_log=False):
         for handler in logger.handlers:
             logger.removeHandler(handler)
 
-    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    formatter = logging.Formatter(
+        "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+    )
 
     if not no_console_log:
         console_handler = logging.StreamHandler()
@@ -30,6 +33,7 @@ def setup_logging(log_level, log_path=None, no_console_log=False):
         logging.info(f"Logging to file: {log_path}")
 
     logging.getLogger(__name__)
+
 
 def main():
     parser = argparse.ArgumentParser(description="Score machine learning models.")
@@ -92,7 +96,9 @@ def main():
             model = pickle.load(f)
         logger.info("Model loaded successfully.")
     except FileNotFoundError:
-        logger.error(f"Error: Model file not found at {model_path}. Please check the path and model_name.")
+        logger.error(
+            f"Error: Model file not found at {model_path}. Please check the path and model_name."
+        )
         return
 
     imputer_path = os.path.join(model_dir, "imputer.pkl")
@@ -102,7 +108,9 @@ def main():
             imputer = pickle.load(f)
         logger.info("Imputer loaded successfully.")
     except FileNotFoundError:
-        logger.error(f"Error: Imputer file not found at {imputer_path}. Please ensure 'train.py' was run.")
+        logger.error(
+            f"Error: Imputer file not found at {imputer_path}. Please ensure 'train.py' was run."
+        )
         return
 
     logger.info(f"Loading dataset from {dataset_path}...")
@@ -110,7 +118,9 @@ def main():
         housing_test = pd.read_csv(dataset_path)
         logger.info("Dataset loaded successfully.")
     except FileNotFoundError:
-        logger.error(f"Error: Dataset file not found at {dataset_path}. Please check the path.")
+        logger.error(
+            f"Error: Dataset file not found at {dataset_path}. Please check the path."
+        )
         return
 
     logger.info("Adding features to the test dataset...")
@@ -118,10 +128,14 @@ def main():
     logger.info("Features added to test dataset.")
 
     housing_test_labels = housing_test_with_features["median_house_value"].copy()
-    housing_test_features = housing_test_with_features.drop("median_house_value", axis=1)
+    housing_test_features = housing_test_with_features.drop(
+        "median_house_value", axis=1
+    )
 
     logger.info("Preparing test data using the loaded imputer...")
-    housing_test_prepared, _ = training.prepare_data(housing_test_features, imputer=imputer)
+    housing_test_prepared, _ = training.prepare_data(
+        housing_test_features, imputer=imputer
+    )
     logger.info("Test data prepared.")
 
     logger.info("Evaluating model performance...")
@@ -141,6 +155,7 @@ def main():
         logger.info("Scores saved.")
 
     logger.info("Model scoring complete.")
+
 
 if __name__ == "__main__":
     main()

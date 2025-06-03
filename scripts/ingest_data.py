@@ -1,9 +1,10 @@
 import argparse
-import os
-import pandas as pd
-from fsds_training import data_ingestion
-from fsds_training import preprocessing
 import logging
+import os
+
+import pandas as pd
+
+from fsds_training import data_ingestion, preprocessing
 
 
 def setup_logging(log_level, log_path=None, no_console_log=False):
@@ -14,7 +15,9 @@ def setup_logging(log_level, log_path=None, no_console_log=False):
         for handler in logger.handlers:
             logger.removeHandler(handler)
 
-    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    formatter = logging.Formatter(
+        "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+    )
 
     if not no_console_log:
         console_handler = logging.StreamHandler()
@@ -29,6 +32,7 @@ def setup_logging(log_level, log_path=None, no_console_log=False):
         logging.info(f"Logging to file: {log_path}")
 
     logging.getLogger(__name__)
+
 
 def main():
     parser = argparse.ArgumentParser(
@@ -96,6 +100,7 @@ def main():
     logger.info("Test dataset saved.")
 
     logger.info("Data ingestion and preparation complete.")
+
 
 if __name__ == "__main__":
     main()
