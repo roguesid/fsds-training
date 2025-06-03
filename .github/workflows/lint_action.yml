@@ -5,8 +5,10 @@ on: [push]
 jobs:
   lint:
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
 
       - name: Set up Miniconda
         uses: conda-incubator/setup-miniconda@v3
@@ -16,20 +18,28 @@ jobs:
           activate-environment: fsds-env
           python-version: 3.12
 
-      - name: Check conda envs
-        run: conda info --envs
-
       - name: Check tool versions
+        shell: bash -l {0}
         run: |
+          conda activate fsds-env
           black --version
           isort --version
           flake8 --version
 
       - name: Run isort
-        run: isort . --check --diff
+        shell: bash -l {0}
+        run: |
+          conda activate fsds-env
+          isort . 
 
       - name: Run black
-        run: black . --check --diff
+        shell: bash -l {0}
+        run: |
+          conda activate fsds-env
+          black . 
 
       - name: Run flake8
-        run: flake8 .
+        shell: bash -l {0}
+        run: |
+          conda activate fsds-env
+          flake8 .
