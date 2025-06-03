@@ -1,0 +1,35 @@
+name: Lint with Conda
+
+on: [push]
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Miniconda
+        uses: conda-incubator/setup-miniconda@v3
+        with:
+          environment-file: .github/workflows/env.yml
+          auto-activate-base: false
+          activate-environment: fsds-env
+          python-version: 3.12
+
+      - name: Check conda envs
+        run: conda info --envs
+
+      - name: Check tool versions
+        run: |
+          black --version
+          isort --version
+          flake8 --version
+
+      - name: Run isort
+        run: isort . --check --diff
+
+      - name: Run black
+        run: black . --check --diff
+
+      - name: Run flake8
+        run: flake8 .
