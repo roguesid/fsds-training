@@ -1,10 +1,10 @@
+import pandas as pd
+from scipy.stats import randint
+from sklearn.ensemble import RandomForestRegressor
 from sklearn.impute import SimpleImputer
 from sklearn.linear_model import LinearRegression
+from sklearn.model_selection import GridSearchCV, RandomizedSearchCV
 from sklearn.tree import DecisionTreeRegressor
-from sklearn.ensemble import RandomForestRegressor
-from sklearn.model_selection import RandomizedSearchCV, GridSearchCV
-from scipy.stats import randint
-import pandas as pd
 
 
 def prepare_data(housing, imputer=None):

@@ -1,0 +1,45 @@
+name: Lint with Conda
+
+on: [push]
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Miniconda
+        uses: conda-incubator/setup-miniconda@v3
+        with:
+          environment-file: env.yml
+          auto-activate-base: false
+          activate-environment: fsds-env
+          python-version: 3.12
+
+      - name: Check tool versions
+        shell: bash -l {0}
+        run: |
+          conda activate fsds-env
+          black --version
+          isort --version
+          flake8 --version
+
+      - name: Run isort
+        shell: bash -l {0}
+        run: |
+          conda activate fsds-env
+          isort . 
+
+      - name: Run black
+        shell: bash -l {0}
+        run: |
+          conda activate fsds-env
+          black . 
+
+      - name: Run flake8
+        shell: bash -l {0}
+        run: |
+          conda activate fsds-env
+          flake8 . || true

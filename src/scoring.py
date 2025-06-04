@@ -1,5 +1,5 @@
-from sklearn.metrics import mean_squared_error, mean_absolute_error
 import numpy as np
+from sklearn.metrics import mean_absolute_error, mean_squared_error
 
 
 def evaluate_model(model, X, y_true):

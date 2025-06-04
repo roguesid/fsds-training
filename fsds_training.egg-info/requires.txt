@@ -1,0 +1,16 @@
+numpy
+pandas
+scikit-learn>=1.6.1
+six>=1.17.0
+
+[formatter]
+black
+isort
+flake8
+
+[plot]
+matplotlib
+seaborn
+
+[test]
+pytest

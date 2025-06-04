@@ -1,0 +1,172 @@
+name: Lint, Test, and Build
+
+on: [push, pull_request]
+
+jobs:
+  lint:
+    name: Lint Code
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Miniconda
+        uses: conda-incubator/setup-miniconda@v3
+        with:
+          environment-file: env.yml
+          auto-activate-base: false
+          activate-environment: fsds-env
+          python-version: 3.12
+
+      - name: Check tool versions
+        shell: bash -l {0}
+        run: |
+          conda activate fsds-env
+          black --version
+          isort --version
+          flake8 --version
+
+      - name: Run isort
+        shell: bash -l {0}
+        run: |
+          conda activate fsds-env
+          isort .
+
+      - name: Run black
+        shell: bash -l {0}
+        run: |
+          conda activate fsds-env
+          black .
+
+      - name: Run flake8
+        shell: bash -l {0}
+        run: |
+          conda activate fsds-env
+          flake8 . || true
+
+  test:
+    name: Unit and Functional Tests
+    runs-on: ubuntu-latest
+    needs: lint
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Miniconda
+        uses: conda-incubator/setup-miniconda@v3
+        with:
+          environment-file: env.yml
+          auto-activate-base: false
+          activate-environment: fsds-env
+          python-version: 3.12
+
+      - name: Install in editable mode
+        shell: bash -l {0}
+        run: |
+          conda activate fsds-env
+          pip install -e .
+
+      - name: Run pytest
+        shell: bash -l {0}
+        run: |
+          conda activate fsds-env
+          pytest tests/
+
+  build:
+    name: Build Package
+    runs-on: ubuntu-latest
+    needs: test
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Miniconda
+        uses: conda-incubator/setup-miniconda@v3
+        with:
+          environment-file: env.yml
+          auto-activate-base: false
+          activate-environment: fsds-env
+          python-version: 3.12
+
+      - name: Install tree CLI tool
+        run: sudo apt-get update && sudo apt-get install -y tree
+
+      - name: Show directory tree before build
+        run: tree -L 2
+
+      - name: Install build tool
+        shell: bash -l {0}
+        run: |
+          conda activate fsds-env
+          pip install build
+
+      - name: Build the package
+        shell: bash -l {0}
+        run: |
+          conda activate fsds-env
+          python -m build
+
+      - name: Show directory tree after build
+        run: tree -L 2
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist-artifacts
+          path: |
+            dist/
+            env.yml
+  install:
+    name: Install and Run Scripts
+    runs-on: ubuntu-latest
+    needs: build
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: dist-artifacts
+          path: ./artifact-dist
+
+      - name: Set up Miniconda
+        uses: conda-incubator/setup-miniconda@v3
+        with:
+          environment-file: artifact-dist/env.yml
+          auto-activate-base: false
+          activate-environment: fsds-env
+          python-version: 3.12
+
+      - name: Install built package
+        shell: bash -l {0}
+        run: |
+          conda activate fsds-env
+          pip install artifact-dist/dist/*0.5.0*.whl
+
+      - name: Run ingest_data.py
+        shell: bash -l {0}
+        run: |
+          conda activate fsds-env
+          echo "[$(date '+%Y-%m-%d %H:%M:%S')] Running ingest_data.py..."
+          python scripts/ingest_data.py
+
+      - name: Run train.py
+        shell: bash -l {0}
+        run: |
+          conda activate fsds-env
+          echo "[$(date '+%Y-%m-%d %H:%M:%S')] Running train.py..."
+          python scripts/train.py
+
+      - name: Run score.py
+        shell: bash -l {0}
+        run: |
+          conda activate fsds-env
+          echo "[$(date '+%Y-%m-%d %H:%M:%S')] Running score.py..."
+          python scripts/score.py
+
+            

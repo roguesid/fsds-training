@@ -1,0 +1,15 @@
+README.md
+pyproject.toml
+fsds_training/__init__.py
+fsds_training/data_ingestion.py
+fsds_training/main.py
+fsds_training/nonstandardcode.py
+fsds_training/preprocessing.py
+fsds_training/scoring.py
+fsds_training/training.py
+fsds_training.egg-info/PKG-INFO
+fsds_training.egg-info/SOURCES.txt
+fsds_training.egg-info/dependency_links.txt
+fsds_training.egg-info/requires.txt
+fsds_training.egg-info/top_level.txt
+tests/test_data_ingestion.py
