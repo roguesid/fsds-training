@@ -41,7 +41,7 @@ jobs:
           -v "${{ github.workspace }}/models:${CONTAINER_MODELS_DIR}" \
           ${{ env.ACR_REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }} \
           python scripts/inference.py \
-          --input_data_path ${CONTAINER_INPUT_DIR}/housing/housing_test.csv \
+          --input_data_path ${CONTAINER_INPUT_DIR}/housing/housing.csv \
           --model_path ${CONTAINER_MODELS_DIR}/random_forest_model.pkl \
           --imputer_path ${CONTAINER_MODELS_DIR}/imputer.pkl \
           --output_predictions_path ${CONTAINER_OUTPUT_DIR}/predictions.csv
