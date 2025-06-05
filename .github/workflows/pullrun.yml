@@ -16,8 +16,6 @@ jobs:
     steps:
     - name: Checkout repository
       uses: actions/checkout@v4
-      # This step is crucial to get your 'datasets' and 'models' folders
-      # which contain the input data, model, and imputer for the inference run.
 
     - name: Log in to Azure Container Registry using username and password
       run: |
@@ -36,8 +34,6 @@ jobs:
         CONTAINER_MODELS_DIR="/app/models"
         CONTAINER_OUTPUT_DIR="/app/datasets" # Output will be in the same dir as input
 
-        # Ensure the output directory exists on the host (GitHub Actions runner)
-        # This is where the predictions.csv will land after the container runs.
         mkdir -p "${{ github.workspace }}/datasets"
 
         docker run \
@@ -45,7 +41,7 @@ jobs:
           -v "${{ github.workspace }}/models:${CONTAINER_MODELS_DIR}" \
           ${{ env.ACR_REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }} \
           python scripts/inference.py \
-          --input_data_path ${CONTAINER_INPUT_DIR}/housing_test.csv \
+          --input_data_path ${CONTAINER_INPUT_DIR}/housing/housing_test.csv \
           --model_path ${CONTAINER_MODELS_DIR}/random_forest_model.pkl \
           --imputer_path ${CONTAINER_MODELS_DIR}/imputer.pkl \
           --output_predictions_path ${CONTAINER_OUTPUT_DIR}/predictions.csv
