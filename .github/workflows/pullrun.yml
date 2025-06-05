@@ -1,7 +1,9 @@
 name: Pull and Run Inference Container
 
 on:
-  workflow_dispatch: # Allows manual triggering from the GitHub Actions tab
+  push:
+    branches:
+      - feat/cdpipeline
 
 env:
   ACR_REGISTRY: ${{ secrets.ACR_LOGIN_SERVER }}
