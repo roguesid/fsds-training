@@ -33,7 +33,7 @@ jobs:
         push: true
         tags: |
           ${{ env.ACR_REGISTRY }}/${{ env.IMAGE_NAME }}:latest
-          ${{ env.ACR_REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }} # Tag with commit SHA for uniqueness
+          ${{ env.ACR_REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
         file: Dockerfile # Specify the Dockerfile path relative to context
         # Provide inputs for your script in case of testing
         build-args: |
