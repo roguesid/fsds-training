@@ -1,2 +1,6 @@
 datasets/
 *:Zone.Identifier
+**/__pycache__/
+fsds_training/
+mlruns/
+mlartifacts/
