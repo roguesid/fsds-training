@@ -3,8 +3,10 @@ import logging
 import os
 import pickle
 import pandas as pd
+import sys
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
-from fsds_training import preprocessing, training
+from src import preprocessing, training
 
 logger = logging.getLogger(__name__)
 
