@@ -6,3 +6,4 @@ mlruns/
 mlartifacts/
 *.ipynb
 *.pytest_cache
+requirements.txtZone.Identifier
