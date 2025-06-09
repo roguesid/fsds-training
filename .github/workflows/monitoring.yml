@@ -1,0 +1,117 @@
+name: Model Drift Monitoring
+
+on:
+  # Allows manual triggering of the workflow from the GitHub UI
+  workflow_dispatch:
+
+jobs:
+  monitor_model_drift:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      issues: write
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.9'
+
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pandas evidently==0.6.7 scikit-learn
+          pip install fsds_training
+
+      - name: Create Directories for Predictions and Reports
+        run: |
+          mkdir -p predictions evidently_reports
+
+      - name: Run Model Inference
+        run: |
+          # Use your committed model and imputer files, and input dataset
+          python scripts/inference.py \
+            --input_data_path "datasets/housing_test.csv" \
+            --model_path "models/random_forest_model.pkl" \
+            --imputer_path "models/imputer.pkl" \
+            --output_predictions_path "predictions/test_predictions.csv" \
+            --log-level "INFO"
+
+
+      - name: Run Model Drift Detection
+        id: drift_check
+        run: |
+          # Use your committed reference predictions file
+          DRIFT_OUTPUT=$(python scripts/drift_detection.py \
+            --current_predictions_path "predictions/test_predictions.csv" \
+            --reference_predictions_path "data/train_predictions.csv" \
+            --report_output_path "evidently_reports/prediction_drift_report.html" \
+            --drift_threshold 0.05 \
+            --prediction_column predicted_median_house_value \
+            --log-level INFO)
+
+          echo "Drift detection output: $DRIFT_OUTPUT"
+          echo "drift_result=$DRIFT_OUTPUT" >> "$GITHUB_OUTPUT"
+
+
+      - name: Upload EvidentlyAI Report (Artifact)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: evidently-drift-report
+          path: evidently_reports/prediction_drift_report.html
+          retention-days: 7
+
+      - name: Create GitHub Issue if Drift Detected
+        if: fromJson(steps.drift_check.outputs.drift_result).drift_detected == true
+        env:
+          GH_TOKEN: ${{ github.token }}
+          DRIFT_DATA: ${{ steps.drift_check.outputs.drift_result }}
+        run: |
+          DRIFT_INFO=$(echo "$DRIFT_DATA" | jq -r '.')
+
+          REPORT_PATH=$(echo "$DRIFT_INFO" | jq -r '.report_path')
+          SHARE_OF_DRIFTED_COLUMNS=$(echo "$DRIFT_INFO" | jq -r '.share_of_drifted_columns')
+          NUM_DRIFTED_COLUMNS=$(echo "$DRIFT_INFO" | jq -r '.number_of_drifted_columns')
+          NUM_FEATURES=$(echo "$DRIFT_INFO" | jq -r '.number_of_columns')
+
+          if echo "$DRIFT_INFO" | jq -e '.drifting_features | length > 0' > /dev/null; then
+              DRIFTING_FEATURES=$(echo "$DRIFT_INFO" | jq -r '.drifting_features | .[] | "- \(.name) (p=\(.p_value), stattest=\(.stattest_name), ref_mean=\(.reference_mean), curr_mean=\(.current_mean))"' | sed 's/\\n//g')
+          else
+              DRIFTING_FEATURES="No specific features reported as drifting."
+          fi
+          TIMESTAMP=$(echo "$DRIFT_INFO" | jq -r '.timestamp')
+
+          ISSUE_TITLE="Model Prediction Drift Detected - ${{ github.ref_name }} (Run #${{ github.run_number }})"
+
+          ISSUE_BODY="
+          **Model Drift Detected in Production Predictions!**
+
+          **Details:**
+          - **Detected At:** \`$TIMESTAMP\`
+          - **Share of Drifting Columns:** \`$(printf "%.2f%%" "$(echo "$SHARE_OF_DRIFTED_COLUMNS * 100" | bc)")\`
+          - **Number of Drifting Columns:** \`$NUM_DRIFTED_COLUMNS\` out of \`$NUM_FEATURES\`
+          - **Full Evidently Report:** [Download Report Artifact](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}/artifacts/evidently-drift-report) (report will be visible after the workflow completes)
+          - **Direct Report Path on Runner:** \`$REPORT_PATH\`
+
+          **Key Drifting Features:**
+          \`\`\`
+          $DRIFTING_FEATURES
+          \`\`\`
+
+          **Action Required:**
+          Please investigate the cause of this drift. It could be due to:
+          - Changes in incoming data distribution (data drift).
+          - Concept drift (the relationship between features and target has changed).
+          - Issues in the data pipeline or model serving.
+
+          [Link to Workflow Run](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})
+          "
+          gh issue create --title "$ISSUE_TITLE" --body "$ISSUE_BODY" || {
+              echo "Failed to create GitHub issue. Ensure 'issues: write' permission is granted."
+              exit 1
+          }
