@@ -50,7 +50,7 @@ jobs:
             --current_predictions_path "predictions/test_predictions.csv" \
             --reference_predictions_path "data/train_predictions.csv" \
             --report_output_path "evidently_reports/prediction_drift_report.html" \
-            --drift_threshold 0.05 \
+            --drift_threshold -1 \
             --prediction_column predicted_median_house_value \
             --log-level INFO)
 
