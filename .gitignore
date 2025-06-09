@@ -4,3 +4,5 @@ datasets/
 fsds_training/
 mlruns/
 mlartifacts/
+*.ipynb
+*.pytest_cache
